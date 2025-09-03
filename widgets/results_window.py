@@ -1,3 +1,13 @@
+"""
+Módulo da tela de resultados.
+
+Este módulo contém a implementação da tela de exibição do
+laudo anatomopatológico completo.
+
+Classes:
+    ResultsWindow: Tela de resultados com o laudo completo.
+"""
+
 from PyQt5.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, 
                              QVBoxLayout, QHBoxLayout, QGridLayout, QGroupBox, 
                              QScrollArea, QFrame, QMessageBox)
@@ -6,30 +16,63 @@ from PyQt5.QtGui import QFont
 import time
 from .animated_button import AnimatedButton
 
+
 class ResultsWindow(QWidget):
+    """
+    Tela de resultados com o laudo anatomopatológico completo.
+    
+    Exibe todas as informações do paciente, dados da amostra,
+    descrições macroscópica e microscópica, e diagnóstico.
+    
+    Attributes:
+        main_window (MainWindow): Referência à janela principal
+    """
+    
     def __init__(self, main_window):
+        """
+        Inicializa a tela de resultados.
+        
+        Args:
+            main_window (MainWindow): Instância da janela principal
+        """
         super().__init__()
         self.main_window = main_window
         self.initUI()
         
     def initUI(self):
+        """
+        Configura a interface gráfica da tela de resultados.
+        
+        Organiza as informações em seções:
+        - Cabeçalho com informações do patologista
+        - Identificação do paciente
+        - Dados da amostra
+        - Descrição macroscópica
+        - Descrição microscópica
+        - Diagnóstico
+        - Botões de ação
+        """
+        # Layout principal
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(20, 20, 20, 20)
         
-        # Cabeçalho
+        # ===== CABEÇALHO =====
         header = QFrame()
         header.setStyleSheet("background-color: #023e8a; border-radius: 10px; padding: 15px;")
         header_layout = QHBoxLayout()
         
+        # Informações do patologista
         user_info = QLabel(f"Dr. {self.main_window.logged_in_user}")
         user_info.setFont(QFont("Arial", 12, QFont.Bold))
         user_info.setStyleSheet("color: white;")
         
+        # Título do laudo
         title = QLabel("Laudo Anatomopatológico")
         title.setFont(QFont("Arial", 16, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("color: white;")
         
+        # Data do laudo
         date_label = QLabel(time.strftime("%d/%m/%Y %H:%M"))
         date_label.setFont(QFont("Arial", 10))
         date_label.setStyleSheet("color: white;")
@@ -38,9 +81,10 @@ class ResultsWindow(QWidget):
         header_layout.addWidget(title)
         header_layout.addWidget(date_label)
         header.setLayout(header_layout)
+        
         main_layout.addWidget(header)
         
-        # Área de conteúdo
+        # ===== ÁREA DE CONTEÚDO COM ROLAGEM =====
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet("""
@@ -69,17 +113,26 @@ class ResultsWindow(QWidget):
         layout = QVBoxLayout()
         layout.setSpacing(20)
         
+        # Verificar se existem dados do paciente
         if not hasattr(self.main_window, 'patient_data') or not self.main_window.patient_data:
             self.show_error_message(layout)
         else:
             self.show_patient_report(layout)
         
+        # Finalizar configuração do conteúdo
         content.setLayout(layout)
         scroll.setWidget(content)
         main_layout.addWidget(scroll)
+        
         self.setLayout(main_layout)
     
     def show_error_message(self, layout):
+        """
+        Exibe mensagem de erro quando não há dados do paciente.
+        
+        Args:
+            layout (QVBoxLayout): Layout onde a mensagem será adicionada
+        """
         error_label = QLabel("Nenhum dado de paciente disponível. Por favor, preencha o formulário primeiro.")
         error_label.setFont(QFont("Arial", 12))
         error_label.setStyleSheet("color: #d9534f; padding: 20px;")
@@ -104,9 +157,15 @@ class ResultsWindow(QWidget):
         layout.addWidget(back_btn, alignment=Qt.AlignCenter)
     
     def show_patient_report(self, layout):
+        """
+        Exibe o laudo completo do paciente.
+        
+        Args:
+            layout (QVBoxLayout): Layout onde o laudo será exibido
+        """
         patient_data = self.main_window.patient_data
         
-        # Seção 1: Identificação do Paciente
+        # ===== SEÇÃO 1: IDENTIFICAÇÃO DO PACIENTE =====
         patient_group = QGroupBox("Identificação do Paciente")
         patient_group.setFont(QFont("Arial", 12, QFont.Bold))
         patient_group.setStyleSheet("""
@@ -128,6 +187,7 @@ class ResultsWindow(QWidget):
         patient_layout.setVerticalSpacing(10)
         patient_layout.setHorizontalSpacing(20)
         
+        # Função auxiliar para adicionar informações
         def add_patient_info(label, value, row):
             label_widget = QLabel(label)
             label_widget.setFont(QFont("Arial", 10, QFont.Bold))
@@ -139,6 +199,7 @@ class ResultsWindow(QWidget):
             value_widget.setStyleSheet("color: #000000;")
             patient_layout.addWidget(value_widget, row, 1)
         
+        # Adicionar informações do paciente
         add_patient_info("Nome:", patient_data.get("patient_name", "N/A"), 0)
         add_patient_info("Data de nascimento:", patient_data.get("birth_date", "N/A"), 1)
         add_patient_info("Sexo:", patient_data.get("gender", "N/A"), 2)
@@ -148,10 +209,24 @@ class ResultsWindow(QWidget):
         patient_group.setLayout(patient_layout)
         layout.addWidget(patient_group)
         
-        # Seção 2: Informações da Amostra
+        # ===== SEÇÃO 2: INFORMAÇÕES DA AMOSTRA =====
         sample_group = QGroupBox("Informações da Amostra")
         sample_group.setFont(QFont("Arial", 12, QFont.Bold))
-        sample_group.setStyleSheet(patient_group.styleSheet())
+        sample_group.setStyleSheet("""
+            QGroupBox {
+                color: #023e8a;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding-top: 15px;
+                background-color: #fafafa;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+        """)
         sample_layout = QGridLayout()
         sample_layout.setVerticalSpacing(10)
         sample_layout.setHorizontalSpacing(20)
@@ -167,10 +242,11 @@ class ResultsWindow(QWidget):
             value_widget.setStyleSheet("color: #000000;")
             sample_layout.addWidget(value_widget, row, 1)
         
+        # Adicionar informações da amostra
         add_sample_info("Material recebido:", patient_data.get("material_type", "N/A"), 0)
         add_sample_info("Local da coleta:", patient_data.get("collection_site", "N/A"), 1)
         add_sample_info("Tipo de procedimento:", patient_data.get("procedure_type", "N/A"), 2)
-        add_sample_info("Tipo de tecido:", patient_data.get("tissue_type", "N/A"), 3)
+        add_sample_info("Tipo de tecido:", patient_data.get("t tissue_type", "N/A"), 3)
         add_sample_info("Medidas do tecido:", patient_data.get("tissue_measurement", "N/A"), 4)
         add_sample_info("Peso do tecido:", patient_data.get("tissue_weight", "N/A"), 5)
         add_sample_info("Meio de conservação:", patient_data.get("preservation_medium", "N/A"), 6)
@@ -179,10 +255,24 @@ class ResultsWindow(QWidget):
         sample_group.setLayout(sample_layout)
         layout.addWidget(sample_group)
         
-        # Seção 3: Macroscopia
+        # ===== SEÇÃO 3: MACROSCOPIA =====
         macro_group = QGroupBox("Macroscopia")
         macro_group.setFont(QFont("Arial", 12, QFont.Bold))
-        macro_group.setStyleSheet(patient_group.styleSheet())
+        macro_group.setStyleSheet("""
+            QGroupBox {
+                color: #023e8a;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding-top: 15px;
+                background-color: #fafafa;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+        """)
         macro_layout = QVBoxLayout()
         macro_text = QTextEdit()
         macro_text.setFont(QFont("Arial", 10))
@@ -196,10 +286,24 @@ class ResultsWindow(QWidget):
         macro_group.setLayout(macro_layout)
         layout.addWidget(macro_group)
         
-        # Seção 4: Microscopia
+        # ===== SEÇÃO 4: MICROSCOPIA =====
         micro_group = QGroupBox("Microscopia")
         micro_group.setFont(QFont("Arial", 12, QFont.Bold))
-        micro_group.setStyleSheet(patient_group.styleSheet())
+        micro_group.setStyleSheet("""
+            QGroupBox {
+                color: #023e8a;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding-top: 15px;
+                background-color: #fafafa;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+        """)
         micro_layout = QVBoxLayout()
         micro_text = QTextEdit()
         micro_text.setFont(QFont("Arial", 10))
@@ -213,10 +317,24 @@ class ResultsWindow(QWidget):
         micro_group.setLayout(micro_layout)
         layout.addWidget(micro_group)
         
-        # Seção 5: Diagnóstico
+        # ===== SEÇÃO 5: DIAGNÓSTICO =====
         diagnosis_group = QGroupBox("Conclusão Diagnóstica")
         diagnosis_group.setFont(QFont("Arial", 12, QFont.Bold))
-        diagnosis_group.setStyleSheet(patient_group.styleSheet())
+        diagnosis_group.setStyleSheet("""
+            QGroupBox {
+                color: #023e8a;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding-top: 15px;
+                background-color: #fafafa;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+        """)
         diagnosis_layout = QVBoxLayout()
         diagnosis_text = QTextEdit()
         diagnosis_text.setFont(QFont("Arial", 10, QFont.Bold))
@@ -228,9 +346,10 @@ class ResultsWindow(QWidget):
         diagnosis_group.setLayout(diagnosis_layout)
         layout.addWidget(diagnosis_group)
         
-        # Botões de ação
+        # ===== BOTÕES DE AÇÃO =====
         button_layout = QHBoxLayout()
         
+        # Botão Nova Análise
         back_btn = QPushButton("Nova Análise")
         back_btn.setFont(QFont("Arial", 11))
         back_btn.setStyleSheet("""
@@ -250,6 +369,7 @@ class ResultsWindow(QWidget):
         
         button_layout.addStretch()
         
+        # Botão Salvar Laudo
         save_btn = AnimatedButton("Salvar Laudo")
         save_btn.setFont(QFont("Arial", 11, QFont.Bold))
         save_btn.setStyleSheet("""
@@ -267,6 +387,7 @@ class ResultsWindow(QWidget):
         save_btn.clicked.connect(self.save_report)
         button_layout.addWidget(save_btn)
         
+        # Botão Imprimir Laudo
         print_btn = QPushButton("Imprimir Laudo")
         print_btn.setFont(QFont("Arial", 11))
         print_btn.setStyleSheet("""
@@ -287,7 +408,19 @@ class ResultsWindow(QWidget):
         layout.addLayout(button_layout)
     
     def save_report(self):
+        """
+        Simula o salvamento do laudo no sistema.
+        
+        Em uma implementação real, aqui seria feita a persistência
+        dos dados em banco de dados ou sistema de arquivos.
+        """
         QMessageBox.information(self, "Sucesso", "Laudo salvo com sucesso no sistema!")
     
     def print_report(self):
+        """
+        Simula a impressão do laudo.
+        
+        Em uma implementação real, aqui seria gerado um PDF
+        ou enviado o documento para impressão.
+        """
         QMessageBox.information(self, "Impressão", "Laudo enviado para impressão!")
