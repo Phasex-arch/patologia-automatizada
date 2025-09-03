@@ -93,7 +93,7 @@ sistema_patologia/
 ### Instalação Rápida
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/sistema-patologia.git
+git clone https://github.com/Phasex-arch/patologia-automatizada
 cd sistema-patologia
 
 # Instale as dependências
