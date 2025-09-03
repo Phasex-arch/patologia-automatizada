@@ -183,7 +183,7 @@ class LoginWindow(QWidget):
         right_layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
         
         # Rodapé
-        footer = QLabel("Sistema de Patologia v1.0 • Desenvolvido para profissionais de saúde")
+        footer = QLabel("Sistema de Patologia v1.0 • Desenvolvido por Phase-X")
         footer.setFont(QFont("Arial", 8))
         footer.setAlignment(Qt.AlignCenter)
         footer.setStyleSheet("color: #666666; margin-top: 20px;")
