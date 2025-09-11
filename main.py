@@ -5,9 +5,9 @@ Ponto de entrada principal do Sistema de Patologia Digital.
 Este módulo inicializa a aplicação Qt e inicia a janela principal.
 É o arquivo que deve ser executado para iniciar o sistema.
 
-Autor: [Seu Nome]
+Autor: Phase-X
 Versão: 1.0
-Data: [Data]
+Data: 09/2025
 """
 
 import sys
